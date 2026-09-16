@@ -3,38 +3,29 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.cluster import KMeans
 
-# Включаем локальный кэш
 fastf1.Cache.enable_cache('f1_cache')
 
 print('Загружаем данные Гран-при Сингапура для анализа ML...')
 session = fastf1.get_session(2024, 'Singapore', 'R')
 session.load(telemetry=True, laps=True)
 
-# Берем быстрый круг Макса Ферстаппена
 ver_lap = session.laps.pick_driver('VER').pick_fastest()
 ver_tel = ver_lap.get_car_data().add_distance()
 
 print(f'Точек телеметрии для анализа: {len(ver_tel)}')
 
-# --- МАШИННОЕ ОБУЧЕНИЕ: K-MEANS ДЛЯ ЗОН ТОРМОЖЕНИЯ ---
 print('Запускаем кластеризацию K-Means...')
 
-# Выбираем признаки для анализа: дистанция и скорость
-# (можно также добавить тормоз, но скорость — главный маркер)
 X = ver_tel[['Distance', 'Speed']]
 
-# Создаем модель KMeans на 3 кластера: 
-# 0 - Разгоны/прямые, 1 - Средняя скорость в поворотах, 2 - Зоны торможения
 kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
 ver_tel['Cluster'] = kmeans.fit_predict(X)
 
 print('Кластеризация завершена!')
 
-# --- ВИЗУАЛИЗАЦИЯ РЕЗУЛЬТАТОВ ML ---
 print('Строим график зон торможения...')
 plt.figure(figsize=(14, 6))
 
-# Рисуем график, где точки окрашены в зависимости от кластера (зоны)
 scatter = plt.scatter(
     ver_tel['Distance'],
     ver_tel['Speed'],
@@ -50,7 +41,6 @@ plt.title('Автоматический поиск зон торможения (
 plt.colorbar(scatter, label='Номер кластера (Зона)')
 plt.grid(True, linestyle='--', alpha=0.6)
 
-# Сохраняем итоговый график ML
 output_filename = 'verstappen_kmeans_braking_zones.png'
 plt.savefig(output_filename, dpi=300, bbox_inches='tight')
 print(f'График кластеризации успешно сохранен в файл: {output_filename}')
