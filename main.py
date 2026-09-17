@@ -44,3 +44,29 @@ plt.grid(True, linestyle='--', alpha=0.6)
 output_filename = 'verstappen_kmeans_braking_zones.png'
 plt.savefig(output_filename, dpi=300, bbox_inches='tight')
 print(f'График кластеризации успешно сохранен в файл: {output_filename}')
+
+# ==========================================
+# 2. ШАРЛЬ ЛЕКЛЕР (LEC)
+# ==========================================
+print('\n--- Анализ: Шарль Леклер ---')
+lec_lap = session.laps.pick_driver('LEC').pick_fastest()
+lec_tel = lec_lap.get_car_data().add_distance()
+
+X_lec = lec_tel[['Distance', 'Speed']]
+kmeans_lec = KMeans(n_clusters=3, random_state=42, n_init=10)
+lec_tel['Cluster'] = kmeans_lec.fit_predict(X_lec)
+
+plt.figure(figsize=(14, 6))
+scatter_lec = plt.scatter(
+    lec_tel['Distance'], lec_tel['Speed'],
+    c=lec_tel['Cluster'], cmap='viridis', s=5
+)
+plt.xlabel('Дистанция по кругу (метры)', fontsize=12)
+plt.ylabel('Скорость (км/ч)', fontsize=12)
+plt.title('Автоматический поиск зон торможения (K-Means) — Шарль Леклер, Сингапур 2024', fontsize=14)
+plt.colorbar(scatter_lec, label='Номер кластера (Зона)')
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.savefig('leclerc_kmeans_braking_zones.png', dpi=300, bbox_inches='tight')
+plt.close()
+print('График Леклера сохранен!')
