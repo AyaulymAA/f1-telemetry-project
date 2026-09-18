@@ -45,9 +45,6 @@ output_filename = 'verstappen_kmeans_braking_zones.png'
 plt.savefig(output_filename, dpi=300, bbox_inches='tight')
 print(f'График кластеризации успешно сохранен в файл: {output_filename}')
 
-# ==========================================
-# 2. ШАРЛЬ ЛЕКЛЕР (LEC)
-# ==========================================
 print('\n--- Анализ: Шарль Леклер ---')
 lec_lap = session.laps.pick_driver('LEC').pick_fastest()
 lec_tel = lec_lap.get_car_data().add_distance()
